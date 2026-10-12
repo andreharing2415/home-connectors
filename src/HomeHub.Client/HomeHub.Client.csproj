@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    What a client needs to talk to a hub: the wire contract and adapters that
+    present the hub as the same IHomeDeviceGateway the vendors implement.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>HomeHub.Client</RootNamespace>
+    <AssemblyName>HomeHub.Client</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\HomeConnectors.Abstractions\HomeConnectors.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>

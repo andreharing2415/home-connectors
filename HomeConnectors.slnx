@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/HomeConnectors.Abstractions/HomeConnectors.Abstractions.csproj" />
+    <Project Path="src/HomeConnectors/HomeConnectors.csproj" />
+    <Project Path="src/HomeHub.Client/HomeHub.Client.csproj" />
+    <Project Path="src/HomeHub/HomeHub.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/HomeConnectors.Tests/HomeConnectors.Tests.csproj" />
+  </Folder>
+</Solution>

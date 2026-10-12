@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The house as data: devices, commands, states, replies, and the narrow port
+    every adapter implements. No I/O and no vendor in here, so a client (the
+    desktop assistant, a phone app) can depend on it without pulling in sockets.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>HomeConnectors</RootNamespace>
+    <AssemblyName>HomeConnectors.Abstractions</AssemblyName>
+  </PropertyGroup>
+
+</Project>
