@@ -24,6 +24,9 @@ internal static partial class HubLog
     [LoggerMessage(15, LogLevel.Warning, "Renovação do token do cofre falhou (HTTP {Status}); emitindo outro.")]
     public static partial void RenewRefused(ILogger logger, int status);
 
+    [LoggerMessage(17, LogLevel.Error, "O cofre não abriu; nova tentativa em 30 s.")]
+    public static partial void VaultOpenFailed(ILogger logger, Exception exception);
+
     [LoggerMessage(16, LogLevel.Warning, "Não consegui renovar o token do cofre.")]
     public static partial void RenewFailed(ILogger logger, Exception exception);
 }

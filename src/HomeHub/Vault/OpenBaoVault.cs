@@ -329,14 +329,33 @@ public sealed class OpenBaoVault : IDisposable
     private sealed record VaultKeys(string UnsealKey, string RootToken, string HubToken);
 }
 
-/// <summary>Keeps the house token alive: renews it now and every twelve hours.</summary>
-public sealed class VaultTokenRenewer(OpenBaoVault vault, ILogger<VaultTokenRenewer> log) : BackgroundService
+/// <summary>
+/// Opens the vault once the service is running — not before, because the
+/// Windows service controller gives a starting process 30 s, and a first-run
+/// init can take longer — then keeps the house token alive. A vault that will
+/// not open is retried every 30 s; meanwhile adapters read "no keys" and say
+/// so, rather than the whole hub refusing to start.
+/// </summary>
+public sealed class VaultKeeper(OpenBaoVault vault, ILogger<VaultKeeper> log) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        while (!vault.IsOpen)
+        {
+            try
+            {
+                await vault.OpenAsync(stoppingToken).ConfigureAwait(false);
+            }
+            catch (Exception e) when (e is HttpRequestException or InvalidOperationException or IOException)
+            {
+                HubLog.VaultOpenFailed(log, e);
+                await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken).ConfigureAwait(false);
+            }
+        }
+
         using var timer = new PeriodicTimer(TimeSpan.FromHours(12));
 
-        do
+        while (await timer.WaitForNextTickAsync(stoppingToken).ConfigureAwait(false))
         {
             try
             {
@@ -347,6 +366,5 @@ public sealed class VaultTokenRenewer(OpenBaoVault vault, ILogger<VaultTokenRene
                 HubLog.RenewFailed(log, e);
             }
         }
-        while (await timer.WaitForNextTickAsync(stoppingToken).ConfigureAwait(false));
     }
 }

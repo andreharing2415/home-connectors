@@ -50,7 +50,7 @@ builder.Services.AddSingleton<ClientToken>();
 
 // The vault, and the stores that read it.
 builder.Services.AddSingleton<OpenBaoVault>();
-builder.Services.AddHostedService<VaultTokenRenewer>();
+builder.Services.AddHostedService<VaultKeeper>();
 builder.Services.AddSingleton<IHomeSecretStore>(provider =>
 {
     var vault = provider.GetRequiredService<OpenBaoVault>();
@@ -79,9 +79,6 @@ builder.Services.AddHostedService(provider => new ConsumptionSampler(
     provider.GetRequiredService<TimeProvider>()));
 
 var app = builder.Build();
-
-// The vault opens before the first request can ask it for a key.
-await app.Services.GetRequiredService<OpenBaoVault>().OpenAsync(CancellationToken.None).ConfigureAwait(false);
 
 var token = app.Services.GetRequiredService<ClientToken>();
 HubLog.Ready(app.Logger, app.Services.GetRequiredService<HomeCatalog>().All.Length, token.Path);

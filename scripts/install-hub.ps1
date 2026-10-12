@@ -116,5 +116,12 @@ for ($i = 0; $i -lt 40; $i++) {
     try { $health = Invoke-RestMethod http://127.0.0.1:8787/api/health -Headers $headers; break } catch { Start-Sleep -Milliseconds 500 }
 }
 if (-not $health) { throw "O hub não respondeu em http://127.0.0.1:8787." }
+
+# The vault opens in the background after the service starts (first run: init).
+for ($i = 0; $i -lt 60 -and -not $health.value.vaultUnsealed; $i++) {
+    Start-Sleep -Seconds 1
+    $health = Invoke-RestMethod http://127.0.0.1:8787/api/health -Headers $headers
+}
+if (-not $health.value.vaultUnsealed) { throw "O cofre não abriu. Veja $DataDir\openbao\openbao.log e o Visualizador de Eventos (origem HomeHub)." }
 Write-Host ("Hub no ar: {0} dispositivos, cofre aberto = {1}" -f $health.value.devices, $health.value.vaultUnsealed)
 Write-Host "Token do cliente: $token"
